@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Login</title>
+  </head>
+  <body class="bg-gray-100">
+    <h1 class="uppercase text-center font-bold text-6xl mt-10 mb-5">
+      Login Page
+    </h1>
+
+    <form action="" class="md:text-center md:align-middle">
+      <label for="name" class="font-semibold text-3xl ml-3 md:text-center"
+        >Name:</label
+      >
+      <input
+        type="name"
+        id="name"
+        name="name"
+        class="w-2/3 p-1 mt-1 border border-gray-300 rounded-md ml-2 md:text-center"
+        required
+      /><br /><br />
+    </form>
+
+    <form id="login-form" class="md:text-center md:align-middle">
+      <label for="email" class="font-semibold text-3xl ml-3 md:text-center"
+        >Email:</label
+      >
+      <input
+        type="email"
+        id="email"
+        name="email"
+        class="w-2/3 p-1 mt-1 border border-gray-300 rounded-md ml-2 md:text-center"
+        required
+      /><br /><br />
+
+      <label for="password" class="font-semibold text-3xl ml-3 md:text-center"
+        >Password:</label
+      >
+      <input
+        type="password"
+        id="password"
+        name="password"
+        class="w-2/3 p-1 mt-1 border border-gray-300 rounded-md ml-2 md:text-center"
+        required
+      /><br /><br />
+
+      <div class="flex flex-col">
+        <p class="italic ml-3 text-center mb-2">
+          NB: As soon as you login your exam time begins. All the best
+        </p>
+
+        <button
+          type="submit"
+          class="w-1/3 mx-auto bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300 mb-3"
+        >
+          Login
+        </button>
+
+        <p class="text-center text-gray-600">
+          Don't have an account?
+          <a href="register.html" class="text-blue-500 hover:underline"
+            >Sign Up</a
+          >
+        </p>
+      </div>
+    </form>
+
+    <script>
+      const form = document.getElementById("login-form");
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+          const response = await fetch("http://localhost:3000/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (response.status === 200) {
+            const data = await response.json();
+
+            localStorage.setItem("token", data.token);
+
+            window.location.href = "exam.html";
+          } else {
+            const errorData = await response.json();
+            alert("Login failed: " + errorData.message);
+          }
+        } catch (error) {
+          alert("Error: " + error.message);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body
+    class="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-8"
+  >
+    <div class="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
+      <h1 class="text-2xl font-semibold text-center mb-4">Mini Test</h1>
+
+      <div class="text-center mb-4 text-lg">
+        <p id="timer">Time Left: 1:00</p>
+      </div>
+
+      <div id="questions"></div>
+
+      <div id="submitButton" class="text-center mt-4">
+        <button
+          id="submitBtn"
+          class="w-full bg-blue-500 text-white py-2 mt-4 rounded hover:bg-blue-600"
+        >
+          Submit Test
+        </button>
+      </div>
+
+      <div id="results" class="text-center mt-4" style="display: none">
+        <h2 class="text-xl font-bold">Test Over!</h2>
+        <p>Your score: <span id="score">0</span> / 10</p>
+        <div class="mt-4">
+          <button
+            id="showAnswersBtn"
+            class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+          >
+            Show Correct Answers
+          </button>
+        </div>
+        <div id="answersContent" class="mt-4" style="display: none"></div>
+        <div class="mt-4">
+          <a href="register.html">
+            <button
+              id="exitPortalBtn"
+              class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+            >
+              Exit Portal
+            </button>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const questions = [
+        {
+          id: 1,
+          question: "What is the longest river in the world?",
+          options: ["Amazon", "Nile", "Yangtze", "Ganges"],
+          answer: "Amazon",
+        },
+        {
+          id: 2,
+          question: "Who developed the theory of relativity?",
+          options: [
+            "Isaac Newton",
+            "Albert Einstein",
+            "Nikola Tesla",
+            "Galileo Galilei",
+          ],
+          answer: "Albert Einstein",
+        },
+        {
+          id: 3,
+          question: "Which country has the largest population in the world?",
+          options: ["India", "China", "USA", "Indonesia"],
+          answer: "China",
+        },
+        {
+          id: 4,
+          question: "In which year did the Titanic sink?",
+          options: ["1910", "1912", "1915", "1920"],
+          answer: "1912",
+        },
+        {
+          id: 5,
+          question: "Which element has the chemical symbol 'O'?",
+          options: ["Oxygen", "Osmium", "Ozone", "Oganesson"],
+          answer: "Oxygen",
+        },
+        {
+          id: 6,
+          question: "What is the capital city of Japan?",
+          options: ["Seoul", "Beijing", "Tokyo", "Osaka"],
+          answer: "Tokyo",
+        },
+        {
+          id: 7,
+          question: "Who is the author of the Harry Potter series?",
+          options: [
+            "J.R.R. Tolkien",
+            "George R.R. Martin",
+            "J.K. Rowling",
+            "C.S. Lewis",
+          ],
+          answer: "J.K. Rowling",
+        },
+        {
+          id: 8,
+          question: "Which planet is known as the 'Red Planet'?",
+          options: ["Mars", "Venus", "Saturn", "Jupiter"],
+          answer: "Mars",
+        },
+        {
+          id: 9,
+          question: "What is the largest desert in the world?",
+          options: ["Sahara", "Arabian", "Gobi", "Antarctic Desert"],
+          answer: "Antarctic Desert",
+        },
+        {
+          id: 10,
+          question: "Which company is known for creating the iPhone?",
+          options: ["Samsung", "Apple", "Nokia", "Sony"],
+          answer: "Apple",
+        },
+      ];
+
+      let timeLeft = 1 * 60;
+      let answers = Array(questions.length).fill(null);
+      let testOver = false;
+      let submitted = false;
+      let showAnswers = false;
+
+      const timerElement = document.getElementById("timer");
+      const submitButton = document.getElementById("submitBtn");
+      const resultsElement = document.getElementById("results");
+      const showAnswersBtn = document.getElementById("showAnswersBtn");
+      const answersContent = document.getElementById("answersContent");
+      const exitPortalBtn = document.getElementById("exitPortalBtn");
+
+      function startTimer() {
+        const timer = setInterval(() => {
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            handleSubmit();
+          } else {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `Time Left: ${minutes}:${String(
+              seconds
+            ).padStart(2, "0")}`;
+          }
+        }, 1000);
+      }
+
+      function handleAnswerChange(questionIndex, selectedAnswer) {
+        if (testOver || submitted) return;
+        answers[questionIndex] = selectedAnswer;
+      }
+
+      function handleSubmit() {
+        testOver = true;
+        submitted = true;
+        submitButton.setAttribute("disabled", "true");
+
+        document.getElementById("questions").style.display = "none";
+        timerElement.style.display = "none";
+
+        showResults();
+      }
+
+      function calculateScore() {
+        return answers.filter(
+          (answer, index) => answer === questions[index].answer
+        ).length;
+      }
+
+      function showResults() {
+        const score = calculateScore();
+        document.getElementById("score").textContent = score;
+        resultsElement.style.display = "block";
+      }
+
+      function showCorrectAnswers() {
+        answersContent.innerHTML = "";
+        questions.forEach((question, index) => {
+          const userAnswer = answers[index];
+          const isCorrect = userAnswer === question.answer;
+          const div = document.createElement("div");
+          div.classList.add("mb-4");
+          div.innerHTML = `
+          <p class="font-semibold">${question.question}</p>
+          <p class="${
+            isCorrect ? "text-green-500" : "text-red-500"
+          }">Correct Answer: ${question.answer}</p>
+          ${
+            userAnswer
+              ? `<p class="${
+                  userAnswer === question.answer
+                    ? "text-green-500"
+                    : "text-red-500"
+                }">Your Answer: ${userAnswer}</p>`
+              : ""
+          }
+        `;
+          answersContent.appendChild(div);
+        });
+        answersContent.style.display = "block";
+      }
+
+      function createQuestions() {
+        const questionsContainer = document.getElementById("questions");
+        questions.forEach((question, index) => {
+          const div = document.createElement("div");
+          div.classList.add("mb-4");
+          div.innerHTML = `
+          <p class="font-semibold mb-2">${question.question}</p>
+          <div class="space-y-2">
+            ${question.options
+              .map(
+                (option) => `
+              <label class="block">
+                <input 
+                  type="radio" 
+                  name="question-${question.id}" 
+                  value="${option}" 
+                  ${answers[index] === option ? "checked" : ""} 
+                  onclick="handleAnswerChange(${index}, '${option}')" 
+                  class="mr-2 leading-tight" 
+                  ${testOver || submitted ? "disabled" : ""} />
+                ${option}
+              </label>
+            `
+              )
+              .join("")}
+          </div>
+        `;
+          questionsContainer.appendChild(div);
+        });
+      }
+
+      function initExam() {
+        createQuestions();
+        startTimer();
+
+        submitButton.addEventListener("click", handleSubmit);
+        showAnswersBtn.addEventListener("click", showCorrectAnswers);
+      }
+
+      initExam();
+    </script>
+  </body>
+</html>
